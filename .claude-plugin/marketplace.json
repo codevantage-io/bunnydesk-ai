@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "bunnydesk-ai",
+  "version": "0.1.0",
+  "description": "Official BunnyDesk plugins for AI coding agents.",
+  "owner": {
+    "name": "Codevantage.io"
+  },
+  "plugins": [
+    {
+      "name": "bunnydesk",
+      "source": "./plugins/bunnydesk",
+      "description": "Create and maintain documentation sites with BunnyDesk through its hosted MCP server.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Codevantage.io"
+      },
+      "license": "MIT",
+      "category": "productivity",
+      "tags": [
+        "documentation",
+        "mcp"
+      ]
+    }
+  ]
+}

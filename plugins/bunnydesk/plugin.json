@@ -1,0 +1,44 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "bunnydesk",
+  "version": "0.1.0",
+  "description": "Create, organize, review, and publish documentation with BunnyDesk.",
+  "author": {
+    "name": "Codevantage.io",
+    "url": "https://bunnydesk.ai"
+  },
+  "homepage": "https://bunnydesk.ai",
+  "repository": "https://github.com/codevantage-io/bunnydesk-ai",
+  "license": "MIT",
+  "keywords": [
+    "bunnydesk",
+    "documentation",
+    "knowledge-base",
+    "markdown",
+    "mcp"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "BunnyDesk",
+        "shortDescription": "Create and maintain BunnyDesk documentation",
+        "longDescription": "Create, organize, review, and publish documentation sites through BunnyDesk's authenticated MCP server and authoring workflows.",
+        "developerName": "Codevantage.io",
+        "category": "Productivity",
+        "capabilities": [
+          "Interactive",
+          "Read",
+          "Write"
+        ],
+        "websiteURL": "https://bunnydesk.ai",
+        "privacyPolicyURL": "https://bunnydesk.ai/privacy",
+        "termsOfServiceURL": "https://bunnydesk.ai/terms",
+        "defaultPrompt": [
+          "Create a BunnyDesk documentation page from these notes.",
+          "Update this BunnyDesk page and save the changes as a draft.",
+          "Review my BunnyDesk site structure and suggest navigation improvements."
+        ]
+      }
+    }
+  }
+}

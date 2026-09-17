@@ -1,0 +1,8 @@
+{
+  "config": {
+    // Long prose lines preserve BunnyDesk's visible line-break semantics.
+    "MD013": false,
+    // Compact tables are intentionally used in skill references.
+    "MD060": false
+  }
+}

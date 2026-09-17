@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "bunnydesk": {
+      "type": "http",
+      "url": "https://app.bunnydesk.ai/mcp/"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "bunnydesk-ai",
+  "owner": {
+    "name": "Codevantage.io"
+  },
+  "metadata": {
+    "description": "Official BunnyDesk plugins for AI coding agents."
+  },
+  "plugins": [
+    {
+      "name": "bunnydesk",
+      "source": "./plugins/bunnydesk",
+      "description": "Create and maintain documentation sites with BunnyDesk through its hosted MCP server."
+    }
+  ]
+}

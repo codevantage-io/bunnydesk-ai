@@ -1,0 +1,25 @@
+{
+  "name": "bunnydesk",
+  "displayName": "BunnyDesk",
+  "version": "0.1.0",
+  "description": "Create and maintain documentation sites with BunnyDesk through its hosted MCP server.",
+  "author": {
+    "name": "Codevantage.io"
+  },
+  "publisher": "Codevantage.io",
+  "repository": "https://github.com/codevantage-io/bunnydesk-ai",
+  "license": "MIT",
+  "keywords": [
+    "bunnydesk",
+    "documentation",
+    "docs",
+    "mcp"
+  ],
+  "category": "integrations",
+  "tags": [
+    "documentation",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./mcp.json"
+}

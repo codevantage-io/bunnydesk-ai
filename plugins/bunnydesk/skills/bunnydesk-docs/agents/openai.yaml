@@ -1,0 +1,18 @@
+---
+interface:
+  display_name: "BunnyDesk Documentation"
+  short_description: "Author and manage BunnyDesk documentation"
+  default_prompt: >-
+    Use $bunnydesk-docs to update my BunnyDesk documentation safely.
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "bunnydesk"
+      description: >-
+        BunnyDesk documentation MCP server
+      transport: "streamable_http"
+      url: "https://app.bunnydesk.ai/mcp/"
+
+policy:
+  allow_implicit_invocation: true

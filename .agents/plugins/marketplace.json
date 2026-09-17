@@ -1,0 +1,20 @@
+{
+  "name": "bunnydesk-ai",
+  "interface": {
+    "displayName": "BunnyDesk"
+  },
+  "plugins": [
+    {
+      "name": "bunnydesk",
+      "source": {
+        "source": "local",
+        "path": "./plugins/bunnydesk"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
