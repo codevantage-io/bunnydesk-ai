@@ -11,8 +11,9 @@ and renderer rules.
 > discovery behavior already present in the application source branch, and the
 > server's MCP tools still need submission-grade safety annotations. Track the
 > remaining gates in [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md).
-> The installation commands below become usable after the initial `main` commit
-> is reviewed and pushed.
+> The commands below describe the intended post-release installation flow; do
+> not advertise or rely on them until production readiness and every blocking
+> release-checklist item are complete.
 
 ## What is included
 
@@ -29,28 +30,37 @@ BunnyDesk through browser OAuth.
 
 ## Install
 
-### Codex and ChatGPT desktop
+### Codex
 
-Add the GitHub repository as a marketplace source:
+Add the GitHub repository as a marketplace source, then install BunnyDesk from
+that marketplace:
 
 ```bash
 codex plugin marketplace add codevantage-io/bunnydesk-ai
+codex plugin add bunnydesk@bunnydesk-ai
 ```
 
-Open Codex CLI, run `/plugins`, select the **BunnyDesk** marketplace, and
-install **BunnyDesk**. Start a new session after installation so its skill and
-MCP server are loaded.
+Start a new session after installation so its skill and MCP server are loaded.
+Complete BunnyDesk browser OAuth when Codex prompts.
 
-For release-controlled environments, add the marketplace with
-`--ref <release-tag>` rather than tracking the default branch.
+ChatGPT desktop installation is not available until BunnyDesk is accepted into
+the OpenAI universal plugin directory; that submission remains release-gated.
+
+For a release-controlled environment, Codex supports pinning the marketplace
+source to an immutable release tag:
+
+```bash
+codex plugin marketplace add codevantage-io/bunnydesk-ai --ref <release-tag>
+codex plugin add bunnydesk@bunnydesk-ai
+```
 
 ### Claude Code
 
 Add and install the marketplace from the shell:
 
 ```bash
-claude plugin marketplace add codevantage-io/bunnydesk-ai
-claude plugin install bunnydesk@bunnydesk-ai
+claude plugin marketplace add codevantage-io/bunnydesk-ai --scope user
+claude plugin install bunnydesk@bunnydesk-ai --scope user
 ```
 
 The equivalent commands inside an interactive Claude Code session are:
@@ -62,7 +72,8 @@ The equivalent commands inside an interactive Claude Code session are:
 
 Use `/plugin marketplace update bunnydesk-ai` to refresh the catalog after a
 new release. Claude discovers the package's `skills/` and `.mcp.json`
-automatically.
+automatically. The current Claude marketplace command does not provide a
+`--ref` option, so do not append a release-tag flag to these commands.
 
 ### Cursor
 
@@ -78,6 +89,13 @@ marketplace, and install it at user or project scope. Cursor does not currently
 provide a documented non-interactive command to install an individual plugin
 from that marketplace.
 
+For a release-controlled environment, Cursor supports pinning the marketplace
+index to a tag or commit:
+
+```bash
+cursor agent plugin marketplace add https://github.com/codevantage-io/bunnydesk-ai.git --git-ref <release-tag>
+```
+
 For a team marketplace, an administrator can open **Dashboard → Plugins**,
 choose **Add Marketplace → Import from Repo**, and import:
 
@@ -89,17 +107,6 @@ For local development, copy `plugins/bunnydesk` to
 `~/.cursor/plugins/local/bunnydesk`, reload Cursor, and verify the plugin under
 **Customize**. A general public one-click install requires acceptance into the
 Cursor Marketplace; this repository does not claim that listing yet.
-
-### Standalone skill fallback
-
-Clients that support Agent Skills but not plugins can install only the skill:
-
-```bash
-npx skills add codevantage-io/bunnydesk-ai --skill bunnydesk-docs
-```
-
-This does not install the MCP connection. Configure
-`https://app.bunnydesk.ai/mcp/` separately in that client.
 
 ## Connect and use
 
@@ -151,7 +158,7 @@ python3 scripts/validate.py
 ```
 
 While the BunnyDesk application repository is available alongside this one,
-also audit the current MCP registry and hosted fallback skill:
+also audit its current MCP registry and renderer contract:
 
 ```bash
 python3 scripts/validate.py --source /path/to/bunnydesk

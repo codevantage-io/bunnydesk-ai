@@ -24,4 +24,4 @@ The authoritative, blocking checklist is
 - Confirm the plugin contains no credentials and uses the production HTTPS endpoint.
 - Test browser OAuth, `list_sites`, a draft page workflow, media upload, navigation update, and approval.
 - Tag an immutable semantic version and publish release notes.
-- Vendor the released skill package—or a self-contained flattened fallback—into the BunnyDesk application repository.
+- Keep the released skill aligned with the BunnyDesk application's MCP tool registry and renderer contract.

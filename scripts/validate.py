@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import re
 import sys
@@ -42,6 +43,7 @@ EXPECTED_TOOLS = {
     "get_site_navigation",
     "update_site_navigation",
     "list_drafts",
+    "update_draft",
     "approve_draft",
     "reject_draft",
     "create_media_upload",
@@ -405,37 +407,59 @@ def validate_repository(v: Validation, documents: dict[Path, dict]) -> None:
             )
 
 
-def validate_source(v: Validation, source: Path) -> None:
-    source_skill = source / "templates" / "agent_setup" / "skill.md"
-    tools_dir = source / "apps" / "mcp" / "tools"
+def validate_installation_docs(v: Validation) -> None:
+    """Keep published onboarding aligned with the supported client CLIs."""
+    readme_path = ROOT / "README.md"
+    if not readme_path.is_file():
+        return
+    readme = readme_path.read_text(encoding="utf-8")
+    required_commands = {
+        "Codex marketplace": "codex plugin marketplace add codevantage-io/bunnydesk-ai",
+        "Codex install": "codex plugin add bunnydesk@bunnydesk-ai",
+        "Claude marketplace": (
+            "claude plugin marketplace add codevantage-io/bunnydesk-ai --scope user"
+        ),
+        "Claude install": "claude plugin install bunnydesk@bunnydesk-ai --scope user",
+        "Cursor marketplace": (
+            "cursor agent plugin marketplace add "
+            "https://github.com/codevantage-io/bunnydesk-ai.git"
+        ),
+        "Cursor release pin": "--git-ref <release-tag>",
+    }
+    for label, command in required_commands.items():
+        v.require(command in readme, f"README is missing the {label} command")
     v.require(
-        source_skill.is_file(), f"BunnyDesk source skill not found: {source_skill}"
+        "--ref <release-tag>" in readme,
+        "README must document Codex release-tag pinning",
     )
+    v.require(
+        "must not be tagged or\n> advertised for installation" in readme
+        and "scripts/check_production.py" in readme,
+        "README must preserve the production OAuth pre-release gate",
+    )
+    v.require(
+        "run `/plugins`" not in readme,
+        "README must use the supported Codex CLI install command, not /plugins",
+    )
+    for stale_reference in (
+        "Standalone skill fallback",
+        "npx skills add",
+        "Configure\n`https://app.bunnydesk.ai/mcp/` separately",
+    ):
+        v.require(
+            stale_reference not in readme,
+            "README must not describe the removed app-hosted standalone skill fallback",
+        )
+
+
+def validate_source(v: Validation, source: Path) -> None:
+    tools_dir = source / "apps" / "mcp" / "tools"
+    renderer_path = source / "apps" / "hosted_sites" / "markdown_extensions.py"
     v.require(tools_dir.is_dir(), f"BunnyDesk MCP tools not found: {tools_dir}")
-    if source_skill.is_file() and SKILL.is_file():
-        source_text = source_skill.read_text(encoding="utf-8")
-        plugin_text = "\n".join(
-            path.read_text(encoding="utf-8")
-            for path in sorted(SKILL.parent.rglob("*.md"))
-        )
-        source_tools = {
-            tool
-            for tool in EXPECTED_TOOLS
-            if re.search(rf"\b{re.escape(tool)}\b", source_text)
-        }
-        plugin_tools = {
-            tool
-            for tool in EXPECTED_TOOLS
-            if re.search(rf"\b{re.escape(tool)}\b", plugin_text)
-        }
-        v.require(
-            source_tools == EXPECTED_TOOLS,
-            "BunnyDesk application skill does not cover the current MCP tool inventory",
-        )
-        v.require(
-            plugin_tools == EXPECTED_TOOLS,
-            "plugin skill package does not cover the current MCP tool inventory",
-        )
+    v.require(
+        renderer_path.is_file(),
+        f"BunnyDesk renderer registry not found: {renderer_path}",
+    )
     if tools_dir.is_dir():
         names: set[str] = set()
         pattern = re.compile(
@@ -446,6 +470,44 @@ def validate_source(v: Validation, source: Path) -> None:
         v.require(
             names == EXPECTED_TOOLS,
             f"MCP tool drift: expected {sorted(EXPECTED_TOOLS)}, found {sorted(names)}",
+        )
+    if renderer_path.is_file():
+        try:
+            module = ast.parse(renderer_path.read_text(encoding="utf-8"))
+            registry = next(
+                node.value
+                for node in module.body
+                if isinstance(node, ast.Assign)
+                and any(
+                    isinstance(target, ast.Name)
+                    and target.id == "COMPONENT_REGISTRY"
+                    for target in node.targets
+                )
+            )
+            renderer_components = set(ast.literal_eval(registry))
+        except (StopIteration, SyntaxError, ValueError) as exc:
+            v.require(False, f"cannot read BunnyDesk renderer registry: {exc}")
+            return
+        v.require(
+            renderer_components == REQUIRED_COMPONENTS,
+            "renderer component drift: "
+            f"expected {sorted(REQUIRED_COMPONENTS)}, found {sorted(renderer_components)}",
+        )
+        authoring_path = SKILL.parent / "references" / "page-authoring.md"
+        authoring = (
+            authoring_path.read_text(encoding="utf-8")
+            if authoring_path.is_file()
+            else ""
+        )
+        missing_components = sorted(
+            component
+            for component in renderer_components
+            if f"<{component}" not in authoring
+        )
+        v.require(
+            not missing_components,
+            "plugin page authoring reference omits renderer components: "
+            f"{', '.join(missing_components)}",
         )
 
 
@@ -465,6 +527,7 @@ def main() -> int:
     validate_compatibility(validation, documents, version)
     validate_skill(validation)
     validate_repository(validation, documents)
+    validate_installation_docs(validation)
     if args.source:
         validate_source(validation, args.source.resolve())
     else:

@@ -18,7 +18,9 @@ BunnyDesk's MCP server provides the tools; this skill defines the safe workflow 
 2. Pass the returned `site_id` to every site-scoped tool. A connection may administer multiple sites; never infer a site from prior calls.
 3. Call `get_site_info` before substantial work and apply its `project_knowledge`.
 4. Before creating or editing content, use `search_pages` to locate related published pages. Because search excludes drafts and may be unavailable without AI credits, use `list_pages` when drafts or a complete inventory matter.
-5. Read an existing page with `get_page` before changing it. `update_page` accepts a complete replacement document, not a patch.
+5. Read existing content with `get_page` before changing it. For a normal page edit, `update_page`
+   accepts a complete replacement document, not a patch. For a draft selected through
+   `list_drafts`, read with its `version_uid` and revise that exact version with `update_draft`.
 
 Treat tool errors as actionable results. Correct the arguments or workflow; do not retry an unchanged call.
 
@@ -28,13 +30,18 @@ Use site, page, and version UIDs only as tool arguments. In user-facing updates,
 
 `create_page` and content-bearing `update_page` publish by default. Set `publish=false` unless the user explicitly requests immediate publication or has clearly authorized a workflow whose outcome is a live site.
 
-`publish=false` applies only to content. Slug and SEO changes made through `update_page` take effect immediately. Avoid combining reviewable content with an unapproved slug or SEO change.
+`publish=false` applies only to content. It creates or continues the page's normal user draft; it
+does not modify an AI or review draft selected through `list_drafts`. Slug and SEO changes made
+through `update_page` take effect immediately. Avoid combining reviewable content with an
+unapproved slug or SEO change.
 
 For draft review:
 
 1. Call `list_drafts`.
 2. Read the candidate with `get_page(page_uid=..., version_uid=...)`.
-3. Approve or reject only when the user authorized that disposition.
+3. If the user requests changes, call `update_draft(version_uid=..., content_markdown=...)` with the
+   complete revised document. Do not use `update_page`: that manages the page's separate user draft.
+4. Approve or reject only when the user authorized that disposition.
 
 `approve_draft` may permanently delete a page when `is_deletion=true`, and it may remove competing user drafts. `reject_draft` is irreversible and may remove a never-published page. Report these outcomes. Before `delete_page`, confirm unless the current request explicitly names the exact page and authorizes permanent deletion.
 

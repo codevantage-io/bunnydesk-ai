@@ -32,7 +32,7 @@ claude plugin validate plugins/bunnydesk --strict
 The plugin repository cannot independently see new tools added to a private
 BunnyDesk application checkout. The BunnyDesk application CI must run the
 `--source` check, or an equivalent cross-repository contract check, whenever
-MCP tools or the hosted fallback skill change.
+MCP tools or the renderer contract change.
 
 ## Hosted MCP server — blocking
 
@@ -67,4 +67,4 @@ python3 scripts/check_production.py
 - [ ] Prepare support/contact details, publisher verification, privacy and terms links, and permission explanations.
 - [ ] Prepare positive, negative, edge-case, and out-of-scope evaluation prompts.
 - [ ] Submit to the OpenAI universal plugin directory and Cursor Marketplace only after live verification passes.
-- [ ] Publish immutable release notes and vendor the released skill into the BunnyDesk application fallback.
+- [ ] Publish immutable release notes after live verification passes.

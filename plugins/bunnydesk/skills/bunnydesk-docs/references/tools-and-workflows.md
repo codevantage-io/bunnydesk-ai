@@ -14,10 +14,11 @@ The connection is account-scoped. Only `list_sites` and `create_site` omit `site
 | Pages | `list_pages` | List editable standard pages, publication state, user-draft state, URL, and sidebar presence. Content is omitted. |
 | Pages | `get_page` | Read complete Markdown, SEO, and a selected version. `auto` prefers an editable user draft; use `version_uid` for an AI/review draft. |
 | Pages | `create_page` | Create a standard page. Requires complete frontmatter/content; publishes by default; does not add navigation. |
-| Pages | `update_page` | Replace content or change slug/SEO. Content publishes by default; slug and SEO changes are immediate. |
+| Pages | `update_page` | Replace normal page content or change slug/SEO. Content publishes by default; `publish=false` creates or continues the page's user draft. It does not modify a version selected through `list_drafts`. |
 | Pages | `delete_page` | Permanently delete a page, all versions, and its navigation links. |
 | Search | `search_pages` | Semantic search over published content only (default 5, maximum 25). Requires workspace AI credits. |
 | Drafts | `list_drafts` | List user and AI drafts, including deletion drafts and task context. |
+| Drafts | `update_draft` | Replace one exact pending draft by `version_uid` while preserving its task, source, and pending status. |
 | Drafts | `approve_draft` | Publish a draft or execute a deletion draft; optional complete content override. |
 | Drafts | `reject_draft` | Permanently discard a draft; may delete a never-published page. |
 | Navigation | `get_site_navigation` | Read `sidebar`, `navbar`, or `footer`; sidebar also returns a concurrency hash and unlinked pages. |
@@ -46,7 +47,13 @@ Tool input schemas are advertised by MCP. Use those rather than copying or guess
 
 ### Review drafts
 
-Use `list_drafts`, then `get_page` with both `page_uid` and `version_uid`. AI-authored drafts are intentionally not returned by ordinary `auto`/`draft` reads. Before approval, inspect `is_deletion`. After approval, report `page_deleted` or any `removed_user_draft_uids`; after rejection, report `page_deleted` when true.
+Use `list_drafts`, then `get_page` with both `page_uid` and `version_uid`. AI-authored drafts are
+intentionally not returned by ordinary `auto`/`draft` reads. If the user requests changes, send the
+complete revised document to `update_draft` with that `version_uid`; this keeps the same version
+pending and preserves its task and source. Do not use `update_page` for a selected review draft,
+because it manages the page's separate user draft. Before approval, inspect `is_deletion`. After
+approval, report `page_deleted` or any `removed_user_draft_uids`; after rejection, report
+`page_deleted` when true.
 
 ## Media workflow
 
