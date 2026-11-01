@@ -90,17 +90,6 @@ For local development, copy `plugins/bunnydesk` to
 **Customize**. A general public one-click install requires acceptance into the
 Cursor Marketplace; this repository does not claim that listing yet.
 
-### Standalone skill fallback
-
-Clients that support Agent Skills but not plugins can install only the skill:
-
-```bash
-npx skills add codevantage-io/bunnydesk-ai --skill bunnydesk-docs
-```
-
-This does not install the MCP connection. Configure
-`https://app.bunnydesk.ai/mcp/` separately in that client.
-
 ## Connect and use
 
 The MCP connection is designed to use browser OAuth; there is no API key to
@@ -114,6 +103,9 @@ only after the production readiness check passes.
    calls for one.
 5. Read `project_knowledge` and existing content before making changes.
 6. Keep content as drafts unless live publication was explicitly authorized.
+
+For page SEO, share-image uploads, noindex, and migration redirects, follow the
+[tool workflows](plugins/bunnydesk/skills/bunnydesk-docs/references/tools-and-workflows.md).
 
 ## Repository layout
 
@@ -151,7 +143,7 @@ python3 scripts/validate.py
 ```
 
 While the BunnyDesk application repository is available alongside this one,
-also audit the current MCP registry and hosted fallback skill:
+also audit the current MCP registry against the plugin's documented tools:
 
 ```bash
 python3 scripts/validate.py --source /path/to/bunnydesk

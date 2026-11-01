@@ -16,7 +16,7 @@ Do not tag `v0.1.0` until every blocking item is complete.
 - [x] Claude Code marketplace and plugin pass strict validation.
 - [x] Cursor marketplace and plugin validate against the current schemas.
 - [x] `bunnydesk-docs` passes Agent Skills validation.
-- [x] All 17 current MCP tools and all six BunnyDesk renderer components are documented.
+- [x] All 20 current MCP tools and all six BunnyDesk renderer components are documented.
 - [x] Relative skill references resolve within the skill package.
 - [x] Manifests use the production HTTPS endpoint and contain no static credentials.
 
@@ -32,7 +32,7 @@ claude plugin validate plugins/bunnydesk --strict
 The plugin repository cannot independently see new tools added to a private
 BunnyDesk application checkout. The BunnyDesk application CI must run the
 `--source` check, or an equivalent cross-repository contract check, whenever
-MCP tools or the hosted fallback skill change.
+MCP tools or the bundled plugin instructions change.
 
 ## Hosted MCP server — blocking
 
@@ -67,4 +67,4 @@ python3 scripts/check_production.py
 - [ ] Prepare support/contact details, publisher verification, privacy and terms links, and permission explanations.
 - [ ] Prepare positive, negative, edge-case, and out-of-scope evaluation prompts.
 - [ ] Submit to the OpenAI universal plugin directory and Cursor Marketplace only after live verification passes.
-- [ ] Publish immutable release notes and vendor the released skill into the BunnyDesk application fallback.
+- [ ] Publish immutable release notes and verify installation from the tagged plugin.

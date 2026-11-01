@@ -1,6 +1,6 @@
 ---
 name: bunnydesk-docs
-description: Create, edit, review, publish, organize, and style documentation sites through the BunnyDesk MCP server. Use for BunnyDesk pages, drafts, navigation, configuration, media, or migrations from another documentation platform.
+description: Create, edit, review, publish, organize, and style documentation sites through the BunnyDesk MCP server. Use for BunnyDesk pages, drafts, navigation, configuration, media, SEO, redirects, or migrations from another documentation platform.
 ---
 
 # Operate BunnyDesk documentation
@@ -18,7 +18,7 @@ BunnyDesk's MCP server provides the tools; this skill defines the safe workflow 
 2. Pass the returned `site_id` to every site-scoped tool. A connection may administer multiple sites; never infer a site from prior calls.
 3. Call `get_site_info` before substantial work and apply its `project_knowledge`.
 4. Before creating or editing content, use `search_pages` to locate related published pages. Because search excludes drafts and may be unavailable without AI credits, use `list_pages` when drafts or a complete inventory matter.
-5. Read an existing page with `get_page` before changing it. `update_page` accepts a complete replacement document, not a patch.
+5. Read an existing page with `get_page` before changing it. `update_page` replaces any supplied document; omit `content_markdown` for metadata-only changes.
 
 Treat tool errors as actionable results. Correct the arguments or workflow; do not retry an unchanged call.
 
@@ -28,7 +28,7 @@ Use site, page, and version UIDs only as tool arguments. In user-facing updates,
 
 `create_page` and content-bearing `update_page` publish by default. Set `publish=false` unless the user explicitly requests immediate publication or has clearly authorized a workflow whose outcome is a live site.
 
-`publish=false` applies only to content. Slug and SEO changes made through `update_page` take effect immediately. Avoid combining reviewable content with an unapproved slug or SEO change.
+`publish=false` applies only to content. Slug, SEO, and `noindex` changes made through `update_page` take effect immediately; redirect changes also apply immediately. Avoid combining reviewable content with an unapproved settings change.
 
 For draft review:
 
@@ -44,6 +44,7 @@ Do not attempt to modify API-reference pages: BunnyDesk manages them in the dash
 
 - `content_markdown` is the complete page document.
 - `seo_metadata` replaces the complete SEO object. Read and resend all keys that must remain.
+- Share images use `seo_metadata.image`; `noindex=true` excludes indexing. Follow the reference's share-image upload workflow without changing the article body.
 - Navigation updates replace an entire navigation section. Always read, modify, and send the complete value. Sidebar updates also require the latest returned `hash` as `base_hash`.
 - Site configuration updates are partial by section and key. Read first, then send only intended changes.
 - Preserve existing component `blockId` values exactly. Never invent them.

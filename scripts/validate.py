@@ -45,6 +45,9 @@ EXPECTED_TOOLS = {
     "approve_draft",
     "reject_draft",
     "create_media_upload",
+    "list_redirects",
+    "upsert_redirects",
+    "delete_redirect",
 }
 SEMVER = re.compile(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?$")
 SECRET_PATTERNS = {
@@ -406,36 +409,8 @@ def validate_repository(v: Validation, documents: dict[Path, dict]) -> None:
 
 
 def validate_source(v: Validation, source: Path) -> None:
-    source_skill = source / "templates" / "agent_setup" / "skill.md"
     tools_dir = source / "apps" / "mcp" / "tools"
-    v.require(
-        source_skill.is_file(), f"BunnyDesk source skill not found: {source_skill}"
-    )
     v.require(tools_dir.is_dir(), f"BunnyDesk MCP tools not found: {tools_dir}")
-    if source_skill.is_file() and SKILL.is_file():
-        source_text = source_skill.read_text(encoding="utf-8")
-        plugin_text = "\n".join(
-            path.read_text(encoding="utf-8")
-            for path in sorted(SKILL.parent.rglob("*.md"))
-        )
-        source_tools = {
-            tool
-            for tool in EXPECTED_TOOLS
-            if re.search(rf"\b{re.escape(tool)}\b", source_text)
-        }
-        plugin_tools = {
-            tool
-            for tool in EXPECTED_TOOLS
-            if re.search(rf"\b{re.escape(tool)}\b", plugin_text)
-        }
-        v.require(
-            source_tools == EXPECTED_TOOLS,
-            "BunnyDesk application skill does not cover the current MCP tool inventory",
-        )
-        v.require(
-            plugin_tools == EXPECTED_TOOLS,
-            "plugin skill package does not cover the current MCP tool inventory",
-        )
     if tools_dir.is_dir():
         names: set[str] = set()
         pattern = re.compile(
@@ -454,7 +429,7 @@ def main() -> int:
     parser.add_argument(
         "--source",
         type=Path,
-        help="optional path to the BunnyDesk application repository for transition drift checks",
+        help="optional path to the BunnyDesk application repository for MCP registry drift checks",
     )
     args = parser.parse_args()
 
