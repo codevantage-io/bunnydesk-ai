@@ -2,6 +2,11 @@
 
 ## Complete document contract
 
+This contract applies to Markdown passed to `create_page`, `update_page`, `update_draft`, and
+the optional content override on `approve_draft`, including changelog review drafts. OpenAPI
+references use JSON/YAML specifications through `upsert_apireference`; do not add Markdown
+frontmatter or convert them into the component format below.
+
 Every `content_markdown` value is a complete document with YAML frontmatter and a body:
 
 ```markdown

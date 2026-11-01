@@ -47,6 +47,7 @@ EXPECTED_TOOLS = {
     "approve_draft",
     "reject_draft",
     "create_media_upload",
+    "upsert_apireference",
 }
 SEMVER = re.compile(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z.-]+)?$")
 SECRET_PATTERNS = {

@@ -1,6 +1,6 @@
 ---
 name: bunnydesk-docs
-description: Create, edit, review, publish, organize, and style documentation sites through the BunnyDesk MCP server. Use for BunnyDesk pages, drafts, navigation, configuration, media, or migrations from another documentation platform.
+description: Create, edit, review, publish, organize, and style documentation sites through the BunnyDesk MCP server. Use for BunnyDesk pages, drafts, changelogs, OpenAPI references, navigation, configuration, media, or documentation migrations.
 ---
 
 # Operate BunnyDesk documentation
@@ -17,8 +17,10 @@ BunnyDesk's MCP server provides the tools; this skill defines the safe workflow 
 1. Call `list_sites`. Reuse the intended site; create one only when the request or repository clearly implies that outcome. Otherwise ask for its name before `create_site`.
 2. Pass the returned `site_id` to every site-scoped tool. A connection may administer multiple sites; never infer a site from prior calls.
 3. Call `get_site_info` before substantial work and apply its `project_knowledge`.
-4. Before creating or editing content, use `search_pages` to locate related published pages. Because search excludes drafts and may be unavailable without AI credits, use `list_pages` when drafts or a complete inventory matter.
-5. Read existing content with `get_page` before changing it. For a normal page edit, `update_page`
+4. Before creating or editing Markdown, use `search_pages` to locate related published pages.
+   Search excludes drafts and requires AI credits. Use `list_pages` for the editable-page inventory
+   and `list_drafts` for review versions. API references use their returned UID, not this inventory.
+5. Read existing Markdown with `get_page` before changing it. For a normal page edit, `update_page`
    accepts a complete replacement document, not a patch. For a draft selected through
    `list_drafts`, read with its `version_uid` and revise that exact version with `update_draft`.
 
@@ -43,9 +45,19 @@ For draft review:
    complete revised document. Do not use `update_page`: that manages the page's separate user draft.
 4. Approve or reject only when the user authorized that disposition.
 
+Changelog versions use the same draft workflow. Review the selected draft against current
+published content and preserve desired entries before approving: publication replaces the page,
+without a changelog-specific stale flag or confirmation argument. Read the reference for automatic
+per-event generation, standard Bunny progress, credits, and dashboard actions.
+
 `approve_draft` may permanently delete a page when `is_deletion=true`, and it may remove competing user drafts. `reject_draft` is irreversible and may remove a never-published page. Report these outcomes. Before `delete_page`, confirm unless the current request explicitly names the exact page and authorizes permanent deletion.
 
-Do not attempt to modify API-reference pages: BunnyDesk manages them in the dashboard.
+API-reference specifications use `upsert_apireference`, never Markdown or draft tools. They publish
+immediately, matching the dashboard. For file/URL inputs, follow the API-reference workflow in
+[references/tools-and-workflows.md](references/tools-and-workflows.md). Retain the returned page UID
+for updates; discovery excludes API references. Creation, specification replacement, and metadata
+updates require authorization for their immediate live effect. A draft-only request does not
+authorize `upsert_apireference`; explain the limitation before proceeding with publication.
 
 ## Preserve replacement-style data
 
@@ -57,4 +69,9 @@ Do not attempt to modify API-reference pages: BunnyDesk manages them in the dash
 
 ## Finish with a read-back
 
-After mutation, verify the affected resource with its corresponding read tool. For multi-step work, also confirm that pages are in the intended sidebar location, internal links use BunnyDesk-returned targets, uploaded media is hosted by BunnyDesk, and any content meant for review remains a draft.
+After `update_draft`, read back that exact `version_uid` and verify it remains pending. After
+approval, verify the published version rather than another pending draft. For API references,
+verify the returned publication status and public URL; ordinary page discovery does not list them.
+For multi-step work, also confirm that pages are in the intended sidebar location, internal links
+use BunnyDesk-returned targets, uploaded media is hosted by BunnyDesk, and any content meant for
+review remains a draft.
