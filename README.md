@@ -7,18 +7,19 @@ and renderer rules.
 
 > **Pre-release:** The package is implemented, but it must not be tagged or
 > advertised for installation until `python3 scripts/check_production.py`
-> passes. The current public BunnyDesk deployment still needs the OAuth
-> discovery behavior already present in the application source branch, and the
-> server's MCP tools still need submission-grade safety annotations. Track the
+> passes. Verify the deployed OAuth discovery, MCP tool inventory, current draft/API-reference
+> behavior, and submission-grade safety annotations against the application source. Track the
 > remaining gates in [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md).
-> The installation commands below become usable after the initial `main` commit
-> is reviewed and pushed.
+> The commands below describe the intended post-release installation flow; do
+> not advertise or rely on them until production readiness and every blocking
+> release-checklist item are complete.
 
 ## What is included
 
 - A portable [Agent Plugins](https://agent-plugins.org/) package.
 - The remote streamable HTTP MCP connection at `https://app.bunnydesk.ai/mcp/`.
 - The `bunnydesk-docs` skill and focused authoring/workflow references.
+- Exact-version draft editing, automatic changelog review, and OpenAPI reference upload/update guidance.
 - Compatibility manifests for OpenAI Codex, Claude Code, and Cursor.
 - Marketplace catalogs for repository, direct-Git, and team distribution.
 - Credential, manifest, path, and MCP-tool coverage validation.
@@ -29,28 +30,37 @@ BunnyDesk through browser OAuth.
 
 ## Install
 
-### Codex and ChatGPT desktop
+### Codex
 
-Add the GitHub repository as a marketplace source:
+Add the GitHub repository as a marketplace source, then install BunnyDesk from
+that marketplace:
 
 ```bash
 codex plugin marketplace add codevantage-io/bunnydesk-ai
+codex plugin add bunnydesk@bunnydesk-ai
 ```
 
-Open Codex CLI, run `/plugins`, select the **BunnyDesk** marketplace, and
-install **BunnyDesk**. Start a new session after installation so its skill and
-MCP server are loaded.
+Start a new session after installation so its skill and MCP server are loaded.
+Complete BunnyDesk browser OAuth when Codex prompts.
 
-For release-controlled environments, add the marketplace with
-`--ref <release-tag>` rather than tracking the default branch.
+ChatGPT desktop installation is not available until BunnyDesk is accepted into
+the OpenAI universal plugin directory; that submission remains release-gated.
+
+For a release-controlled environment, Codex supports pinning the marketplace
+source to an immutable release tag:
+
+```bash
+codex plugin marketplace add codevantage-io/bunnydesk-ai --ref <release-tag>
+codex plugin add bunnydesk@bunnydesk-ai
+```
 
 ### Claude Code
 
 Add and install the marketplace from the shell:
 
 ```bash
-claude plugin marketplace add codevantage-io/bunnydesk-ai
-claude plugin install bunnydesk@bunnydesk-ai
+claude plugin marketplace add codevantage-io/bunnydesk-ai --scope user
+claude plugin install bunnydesk@bunnydesk-ai --scope user
 ```
 
 The equivalent commands inside an interactive Claude Code session are:
@@ -62,7 +72,8 @@ The equivalent commands inside an interactive Claude Code session are:
 
 Use `/plugin marketplace update bunnydesk-ai` to refresh the catalog after a
 new release. Claude discovers the package's `skills/` and `.mcp.json`
-automatically.
+automatically. The current Claude marketplace command does not provide a
+`--ref` option, so do not append a release-tag flag to these commands.
 
 ### Cursor
 
@@ -78,6 +89,13 @@ marketplace, and install it at user or project scope. Cursor does not currently
 provide a documented non-interactive command to install an individual plugin
 from that marketplace.
 
+For a release-controlled environment, Cursor supports pinning the marketplace
+index to a tag or commit:
+
+```bash
+cursor agent plugin marketplace add https://github.com/codevantage-io/bunnydesk-ai.git --git-ref <release-tag>
+```
+
 For a team marketplace, an administrator can open **Dashboard → Plugins**,
 choose **Add Marketplace → Import from Repo**, and import:
 
@@ -89,17 +107,6 @@ For local development, copy `plugins/bunnydesk` to
 `~/.cursor/plugins/local/bunnydesk`, reload Cursor, and verify the plugin under
 **Customize**. A general public one-click install requires acceptance into the
 Cursor Marketplace; this repository does not claim that listing yet.
-
-### Standalone skill fallback
-
-Clients that support Agent Skills but not plugins can install only the skill:
-
-```bash
-npx skills add codevantage-io/bunnydesk-ai --skill bunnydesk-docs
-```
-
-This does not install the MCP connection. Configure
-`https://app.bunnydesk.ai/mcp/` separately in that client.
 
 ## Connect and use
 
@@ -113,7 +120,18 @@ only after the production readiness check passes.
 4. Select the returned `site_id`; create a site only when the request clearly
    calls for one.
 5. Read `project_knowledge` and existing content before making changes.
-6. Keep content as drafts unless live publication was explicitly authorized.
+6. Keep Markdown edits as drafts unless live publication was explicitly authorized. Use
+   `update_draft` for a selected review version, not the page's separate user-draft path.
+7. Review changelogs against current published content and use ordinary draft approval. Each
+   received GitHub merge produces a separate Bunny task; there is no batching or special publish gate.
+8. API references use `upsert_apireference` and publish immediately. Use a public spec URL or
+   `create_media_upload(purpose="api_reference")` → PUT → upload-token finalization. They cannot
+   be saved as Markdown drafts.
+
+The complete tool inventory and procedures live in the skill's
+[tools and workflows reference](plugins/bunnydesk/skills/bunnydesk-docs/references/tools-and-workflows.md).
+Changelog source setup, manual sync, generation progress, and retry remain dashboard actions.
+MCP can read, edit, and review generated changelog versions; it does not expose a generation command.
 
 ## Repository layout
 
@@ -151,7 +169,7 @@ python3 scripts/validate.py
 ```
 
 While the BunnyDesk application repository is available alongside this one,
-also audit the current MCP registry and hosted fallback skill:
+also audit its current MCP registry and renderer contract:
 
 ```bash
 python3 scripts/validate.py --source /path/to/bunnydesk
@@ -175,6 +193,12 @@ Before tagging a release, test a clean install and upgrade, then verify browser
 OAuth and representative calls against production: site discovery, draft page
 creation, media upload, navigation update, and draft approval. Do not publish a
 release based only on static manifest validation.
+
+Also verify exact-version draft edits remain pending, stale changelog confirmation preserves
+review boundaries, and API references work through both URL and staged-file inputs. The upload
+alone must not publish; a successful upsert publishes immediately. Test failure and expiry paths.
+An updated source checkout does not update an installed client package or deploy the server;
+release/install the matching plugin revision and start a new session after updating it.
 
 ## Contributing and security
 
