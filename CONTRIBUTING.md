@@ -11,9 +11,10 @@ Thank you for helping improve the BunnyDesk agent plugin.
 5. Open a pull request describing the user-facing effect and the clients tested.
 
 Changes to MCP tool names or behavior should update the BunnyDesk server first.
-Then update the skill, expected tool inventory, validation fixtures, changelog,
-and release version together. Keep the skill focused on cross-tool judgment;
-the MCP server's tool schemas remain the authority for call arguments.
+Then update the skill, expected tool inventory, validation fixtures, and changelog
+together. Update matching manifest versions when preparing the release. Keep the
+skill focused on cross-tool judgment; the MCP server's tool schemas remain the
+authority for call arguments.
 
 ## Release checklist
 
@@ -24,4 +25,4 @@ The authoritative, blocking checklist is
 - Confirm the plugin contains no credentials and uses the production HTTPS endpoint.
 - Test browser OAuth, `list_sites`, a draft page workflow, media upload, navigation update, and approval.
 - Tag an immutable semantic version and publish release notes.
-- Vendor the released skill package—or a self-contained flattened fallback—into the BunnyDesk application repository.
+- Keep the bundled skill consistent with the hosted MCP tools in the BunnyDesk application.

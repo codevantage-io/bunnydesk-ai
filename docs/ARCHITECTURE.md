@@ -31,17 +31,13 @@ BunnyDesk MCP server.
 
 ## Source of truth
 
-The first plugin release carries forward the behavior of the BunnyDesk
-application's `templates/agent_setup/skill.md`, while restructuring detailed
-guidance into references for progressive disclosure. Once that release is
-accepted, `plugins/bunnydesk/skills/bunnydesk-docs/` becomes canonical.
+`plugins/bunnydesk/skills/bunnydesk-docs/` is canonical for the bundled
+instructions and workflow references. The application owns the hosted MCP
+tools and their input schemas. Plugin validation checks that its documented
+tool inventory matches the application registry when `--source` is supplied.
 
-The application should then vendor the reviewed release. Its standalone
-`/agent-setup/skill.md` fallback must remain self-contained, so a release sync
-must either flatten the linked references into that file or expose and install
-the full skill directory. It must not fetch GitHub at request time. CI in both
-repositories should compare tool coverage and release identity rather than
-requiring different packaging forms to be byte-identical.
+The plugin is the supported distribution channel. There is no standalone
+skill-download fallback or separate manual MCP installation workflow.
 
 ## Versioning and release controls
 

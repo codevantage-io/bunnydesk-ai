@@ -115,6 +115,9 @@ only after the production readiness check passes.
 5. Read `project_knowledge` and existing content before making changes.
 6. Keep content as drafts unless live publication was explicitly authorized.
 
+For page SEO, share-image uploads, noindex, and migration redirects, follow the
+[tool workflows](plugins/bunnydesk/skills/bunnydesk-docs/references/tools-and-workflows.md).
+
 ## Repository layout
 
 ```text
@@ -151,7 +154,7 @@ python3 scripts/validate.py
 ```
 
 While the BunnyDesk application repository is available alongside this one,
-also audit the current MCP registry and hosted fallback skill:
+also audit the current MCP registry against the plugin's documented tools:
 
 ```bash
 python3 scripts/validate.py --source /path/to/bunnydesk

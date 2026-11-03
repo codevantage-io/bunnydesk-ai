@@ -5,6 +5,8 @@ All notable changes to this repository are documented here. Releases follow
 
 ## [Unreleased]
 
+- Document page SEO, share-image uploads, noindex, and migration redirect tools; align source validation with plugin-only distribution.
+
 ## [0.1.0] - 2026-09-16
 
 ### Added
